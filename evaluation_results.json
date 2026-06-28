@@ -1,0 +1,13 @@
+{
+  "_note": "PLACEHOLDER — replace with output from Colab Section 6 after training",
+  "baseline_accuracy": null,
+  "finetuned_accuracy": null,
+  "improvement": null,
+  "test_set_size": 32,
+  "label_map": {
+    "Evidence-Based Analysis": 0,
+    "Speculative Opinion": 1,
+    "Market Reaction": 2
+  },
+  "model": "distilbert-base-uncased"
+}
