@@ -1,13 +1,30 @@
 {
-  "_note": "PLACEHOLDER — replace with output from Colab Section 6 after training",
-  "baseline_accuracy": null,
-  "finetuned_accuracy": null,
-  "improvement": null,
+  "baseline_accuracy": 1.0,
+  "finetuned_accuracy": 0.75,
+  "improvement": -0.25,
   "test_set_size": 32,
   "label_map": {
     "Evidence-Based Analysis": 0,
     "Speculative Opinion": 1,
     "Market Reaction": 2
   },
-  "model": "distilbert-base-uncased"
+  "model": "distilbert-base-uncased",
+  "finetuned_per_class": {
+    "Evidence-Based Analysis": { "precision": 0.92, "recall": 1.0, "f1": 0.96, "support": 11 },
+    "Speculative Opinion": { "precision": 1.0, "recall": 0.27, "f1": 0.43, "support": 11 },
+    "Market Reaction": { "precision": 0.59, "recall": 1.0, "f1": 0.74, "support": 10 }
+  },
+  "baseline_per_class": {
+    "Evidence-Based Analysis": { "precision": 1.0, "recall": 1.0, "f1": 1.0, "support": 11 },
+    "Speculative Opinion": { "precision": 1.0, "recall": 1.0, "f1": 1.0, "support": 11 },
+    "Market Reaction": { "precision": 1.0, "recall": 1.0, "f1": 1.0, "support": 10 }
+  },
+  "confusion_matrix": {
+    "labels": ["Evidence-Based Analysis", "Speculative Opinion", "Market Reaction"],
+    "matrix": [
+      [11, 0, 0],
+      [1, 3, 7],
+      [0, 0, 10]
+    ]
+  }
 }

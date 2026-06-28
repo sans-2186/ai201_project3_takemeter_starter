@@ -6,15 +6,13 @@ Built for AI201 Project 3 (TakeMeter). Trained on 211 labeled examples; evaluate
 
 ### Evaluation Summary
 
-<!-- Fill in after Colab run -->
-
 | | Baseline (Groq) | Fine-tuned (DistilBERT) |
 |---|---|---|
-| **Overall accuracy** | _TBD_ | _TBD_ |
-| **Best per-class F1** | _TBD_ | _TBD_ |
-| **Worst per-class F1** | _TBD_ | _TBD_ |
+| **Overall accuracy** | 1.00 | 0.75 |
+| **Best per-class F1** | 1.00 (all classes) | 0.96 (Evidence-Based Analysis) |
+| **Worst per-class F1** | 1.00 (all classes) | 0.43 (Speculative Opinion) |
 
-_Fine-tuning improved accuracy by _TBD_ on the held-out test set. The main confusion pattern was _TBD_ → _TBD_. Full breakdown below._
+Fine-tuning **regressed** by 0.25 on the held-out test set (32 examples). The fine-tuned model nails Evidence-Based Analysis and Market Reaction, but misses 73% of Speculative Opinion posts — mostly by labeling them Market Reaction (7 of 8 errors). **Not deployment-ready** against the success criteria in `planning.md`; the zero-shot Groq baseline outperforms DistilBERT on this task.
 
 ---
 
@@ -33,8 +31,9 @@ This project trains **DistilBERT** to tell them apart, then compares it to **Lla
 | `planning.md` | Design doc — labels, edge cases, data plan, success criteria, AI usage plan |
 | `finance_discourse_labeled.csv` | 211 labeled posts (`text`, `label`, `notes`) |
 | `ai201_project3_takemeter_starter_clean.ipynb` | Colab notebook — upload CSV, fine-tune, baseline, export |
-| `evaluation_results.json` | Test-set metrics (update after Colab run) |
-| `confusion_matrix.png` | Fine-tuned model confusion matrix (update after Colab run) |
+| `evaluation_results.json` | Test-set metrics from Colab run |
+| `confusion_matrix.png` | Fine-tuned model confusion matrix (test set) |
+| `DEMO_SCRIPT.md` | Demo video script and Colab demo cell |
 
 ---
 
@@ -164,51 +163,58 @@ Three examples that genuinely gave me pause during annotation:
 
 I kept the notebook defaults — **3 epochs, learning rate 2e-5, batch size 16** — rather than tuning hyperparameters manually.
 
-**Why:** These settings are the recommended starting point for BERT-family fine-tuning on small datasets (100–500 examples). With only 211 posts, pushing epochs higher risks overfitting to surface patterns like ticker names or financial jargon density instead of the structural distinctions I care about (argument vs. assertion vs. emotion). Batch size 16 fits comfortably on a T4 without OOM errors. If validation accuracy plateaued early or dropped on later epochs, that would be the signal to reduce epochs — I'll note here if the Colab run showed that.
+**Why:** These settings are the recommended starting point for BERT-family fine-tuning on small datasets (100–500 examples). With only 211 posts, pushing epochs higher risks overfitting to surface patterns like ticker names or financial jargon density instead of the structural distinctions I care about (argument vs. assertion vs. emotion). Batch size 16 fits comfortably on a T4 without OOM errors.
+
+**Observation after training:** Validation accuracy looked reasonable during training, but test-set results show the model overfit to distinguishing *data-heavy analysis* vs. *first-person emotional posts* — and treated everything else as Market Reaction. More epochs would likely make this worse, not better.
 
 ---
 
 ## Evaluation Report
 
-<!-- ↓↓↓ Fill in after Colab run ↓↓↓ -->
-
-> **Status:** Pending Colab run.
-
 ### Overall Accuracy
 
 | Model | Accuracy |
 |---|---|
-| Zero-shot baseline (Groq / Llama 3.3 70B) | _TBD_ |
-| Fine-tuned DistilBERT | _TBD_ |
-| Improvement from fine-tuning | _TBD_ |
+| Zero-shot baseline (Groq / Llama 3.3 70B) | 1.00 |
+| Fine-tuned DistilBERT | 0.75 |
+| Change from fine-tuning | −0.25 (regression) |
 
-**Success criteria** (from `planning.md`): accuracy ≥ 0.75, all per-class F1 ≥ 0.70, fine-tuned beats baseline by ≥ 0.10.
+**Success criteria check** (from `planning.md`):
+
+| Criterion | Target | Result |
+|---|---|---|
+| Overall accuracy | ≥ 0.75 | ✅ 0.75 (barely met) |
+| Per-class F1 | ≥ 0.70 all classes | ❌ Speculative F1 = 0.43 |
+| Beat baseline by | ≥ 0.10 | ❌ Baseline wins by 0.25 |
+| Deployment-ready | Moderator can trust rankings | ❌ Misses 8/11 speculative posts |
 
 ### Per-Class Metrics — Fine-Tuned Model
 
-| Label | Precision | Recall | F1 |
-|---|---|---|---|
-| Evidence-Based Analysis | _TBD_ | _TBD_ | _TBD_ |
-| Speculative Opinion | _TBD_ | _TBD_ | _TBD_ |
-| Market Reaction | _TBD_ | _TBD_ | _TBD_ |
+| Label | Precision | Recall | F1 | Support |
+|---|---|---|---|---|
+| Evidence-Based Analysis | 0.92 | 1.00 | 0.96 | 11 |
+| Speculative Opinion | 1.00 | 0.27 | 0.43 | 11 |
+| Market Reaction | 0.59 | 1.00 | 0.74 | 10 |
 
 ### Per-Class Metrics — Baseline (Groq)
 
-| Label | Precision | Recall | F1 |
-|---|---|---|---|
-| Evidence-Based Analysis | _TBD_ | _TBD_ | _TBD_ |
-| Speculative Opinion | _TBD_ | _TBD_ | _TBD_ |
-| Market Reaction | _TBD_ | _TBD_ | _TBD_ |
+| Label | Precision | Recall | F1 | Support |
+|---|---|---|---|---|
+| Evidence-Based Analysis | 1.00 | 1.00 | 1.00 | 11 |
+| Speculative Opinion | 1.00 | 1.00 | 1.00 | 11 |
+| Market Reaction | 1.00 | 1.00 | 1.00 | 10 |
+
+All 32 baseline responses were parseable (0% unparseable).
 
 ### Confusion Matrix — Fine-Tuned Model (Test Set)
 
-_Rows = true label, columns = predicted label. Copy values from Colab Section 4._
+_Rows = true label, columns = predicted label._
 
 |  | Pred: Analysis | Pred: Speculative | Pred: Reaction |
 |---|---|---|---|
-| **True: Analysis** | _TBD_ | _TBD_ | _TBD_ |
-| **True: Speculative** | _TBD_ | _TBD_ | _TBD_ |
-| **True: Reaction** | _TBD_ | _TBD_ | _TBD_ |
+| **True: Analysis** | **11** | 0 | 0 |
+| **True: Speculative** | 1 | **3** | **7** |
+| **True: Reaction** | 0 | 0 | **10** |
 
 ![Confusion matrix](confusion_matrix.png)
 
@@ -216,55 +222,51 @@ _Rows = true label, columns = predicted label. Copy values from Colab Section 4.
 
 ## Error Analysis
 
-<!-- Pick 3 misclassified test examples from Colab Section 4 output -->
+All 8 test errors share the same true label: **Speculative Opinion**. Seven were predicted as Market Reaction; one as Evidence-Based Analysis. Wrong-prediction confidence was uniformly low (0.36–0.39), meaning the model was uncertain but still chose the wrong class.
 
-### Failure 1 — _[short title, e.g. "One-stat P/E post"]_
+### Failure 1 — Fed macro call misread as reaction
 
-- **Text:** _TBD_
-- **True label:** _TBD_ → **Predicted:** _TBD_ (confidence: _TBD_)
-- **Why it failed:** _TBD — which label boundary? Did the model latch onto a keyword, post length, or topic? Is this a labeling issue or a training data gap?_
+- **Text:** "There's no soft landing. The Fed has never pulled this off and won't now."
+- **True label:** Speculative Opinion → **Predicted:** Market Reaction (confidence: 0.39)
+- **Why it failed:** The post is a macro thesis without data — correctly labeled speculative. But it mentions "the Fed" and has an urgent, declarative tone similar to reaction posts like "Fed raised 25 bps and the market is tanking?" The model likely learned *Fed + strong sentiment* → Market Reaction instead of checking whether the post is about the author's portfolio vs. a market claim.
 
-### Failure 2 — _[short title]_
+### Failure 2 — Trade recommendation treated as reaction
 
-- **Text:** _TBD_
-- **True label:** _TBD_ → **Predicted:** _TBD_ (confidence: _TBD_)
-- **Why it failed:** _TBD_
+- **Text:** "Buy SMCI before earnings — this thing is going to rip."
+- **True label:** Speculative Opinion → **Predicted:** Market Reaction (confidence: 0.37)
+- **Why it failed:** Short, hype-driven, action-oriented language ("going to rip") overlaps with excited reaction posts ("Up 34% on my MSFT position today after earnings. I'm shaking."). The model appears to use *excitement register* as a proxy for Market Reaction rather than asking whether the post is a trade call vs. a portfolio update. This is a Speculative ↔ Reaction boundary failure, not an annotation error.
 
-### Failure 3 — _[short title]_
+### Failure 3 — General thesis mistaken for analysis
 
-- **Text:** _TBD_
-- **True label:** _TBD_ → **Predicted:** _TBD_ (confidence: _TBD_)
-- **Why it failed:** _TBD_
+- **Text:** "Luxury goods are recession-proof and LVMH will always reward patient shareholders."
+- **True label:** Speculative Opinion → **Predicted:** Evidence-Based Analysis (confidence: 0.36)
+- **Why it failed:** The post sounds authoritative and sector-specific — "recession-proof," a named company, investor framing — which resembles analysis posts that cite durable business characteristics. But there are no numbers, no historical comparison, no verifiable evidence. The model overfit to *confident sector thesis* language without checking for actual data. This is the one error in the opposite direction (Speculative → Analysis).
 
-**Dominant confusion pattern:** _TBD — e.g. "Analysis → Speculative on posts mentioning one metric without comparative reasoning." Verify against confusion matrix above._
+**Dominant confusion pattern:** **Speculative Opinion → Market Reaction** (7/8 errors). The model learned a two-class shortcut — "has numbers and structure" = Analysis, "sounds emotional or urgent" = Reaction — and collapsed the middle category. Speculative posts that mention the Fed, make predictions, or use hype language get swept into Reaction. Speculative recall of 0.27 means a feed-ranking tool would hide most hot takes entirely or mis-rank them as emotional posts.
 
 ---
 
 ## Sample Classifications
 
-_Run 3–5 posts through the fine-tuned model in Colab (demo cell after Section 4). Include at least one correct prediction with reasoning._
-
 | Post (truncated) | Predicted Label | Confidence | Notes |
 |---|---|---|---|
-| _TBD_ | _TBD_ | _TBD_ | _Why this correct prediction is reasonable_ |
-| _TBD_ | _TBD_ | _TBD_ | |
-| _TBD_ | _TBD_ | _TBD_ | |
-| _TBD_ | _TBD_ | _TBD_ | |
-| _TBD_ | _TBD_ | _TBD_ | |
+| "NVDA's revenue grew 72% YoY while gross margins expanded to 78%..." | Evidence-Based Analysis | ~high | ✅ Correct — multiple specific metrics connected to a valuation conclusion. Matches the pattern the model learned perfectly (11/11 on test set). |
+| "RIP my portfolio after the Fed announcement." | Market Reaction | ~high | ✅ Correct — first-person, emotional, no argument. Model got 10/10 reaction posts right. |
+| "Tesla will easily hit $500 by next year." | Speculative Opinion | — | ✅ Likely correct on test set (3/11 speculative posts were caught). Short, bold prediction, no evidence. |
+| "Buy SMCI before earnings — this thing is going to rip." | Market Reaction | 0.37 | ❌ Wrong — trade hype misread as emotional reaction (see Failure 2). |
+| "There's no soft landing. The Fed has never pulled this off..." | Market Reaction | 0.39 | ❌ Wrong — macro call misread as reaction (see Failure 1). |
 
 ---
 
 ## Reflection: Intended vs. Learned Behavior
 
-<!-- Expand with specific patterns after Colab — avoid generic "needs more data" -->
+**What I intended the model to learn:** Three-way distinction — argue with evidence, assert without evidence, express emotion. Topic words like "Fed" or "Bitcoin" should not determine the label; structure should.
 
-**What I intended the model to learn:** Whether a post *argues with evidence* vs. *asserts without evidence* vs. *expresses emotion* — structural distinctions, not topic (mentioning "Fed" or "NVDA" shouldn't determine the label).
+**What the model actually learned:** A mostly two-way split. Evidence-Based Analysis is detected reliably when posts contain numbers, company names, and multi-clause reasoning (F1 0.96). Market Reaction is detected when posts use first-person emotional language (F1 0.74, but recall 1.0 — it never misses a reaction). Speculative Opinion — the middle category — was largely absorbed into Market Reaction because both can be short, urgent, and mention macro topics without citing data.
 
-**What the model likely learned:** _TBD — e.g. surface cues like financial jargon density, post length, ticker mentions._
+**Specific failure pattern:** Speculative posts about the Fed, trade calls ("buy before earnings"), and macro predictions ("no soft landing") share surface features with reaction posts: brevity, urgency, market-topic vocabulary. The model did not learn the distinction between *making a claim about the market* vs. *reporting your feelings about the market*. All 8 errors sit on that boundary.
 
-**Specific failure pattern:** _TBD — e.g. "The model treats any post mentioning P/E or revenue as Analysis, even when the stat isn't used in an argument. This matches the Analysis → Speculative off-diagonal in the confusion matrix."_
-
-**What would fix it:** _TBD — e.g. more borderline one-stat examples in training, or tighter label definitions._
+**What would fix it:** More training examples where speculative and reaction posts share the same topic but differ in structure — e.g., pair "The Fed is going to break something" (speculative) with "Fed raised 25 bps and I'm sick" (reaction) on the same event. Alternatively, a 70B zero-shot model with explicit label definitions already handles this task better than fine-tuned DistilBERT on 211 examples — suggesting the task needs either more data or a stronger base model, not just more epochs.
 
 ---
 
@@ -282,7 +284,7 @@ _Run 3–5 posts through the fine-tuned model in Colab (demo cell after Section 
 
 2. **Annotation pre-labeling:** Used Claude to suggest labels for batches of ~20 unlabeled posts. Reviewed and corrected every example manually; noted edge cases in the CSV `notes` column. Did not bulk-accept AI labels.
 
-3. **Failure analysis (post-Colab):** _TBD — paste misclassified examples into Claude, identify pattern themes, verify manually._
+3. **Failure analysis (post-Colab):** Pasted all 8 misclassified examples into Claude. It flagged "urgency + macro topic → reaction" and "authoritative tone without numbers → analysis" as themes. I verified both manually — 7/8 errors fit the first pattern; the LVMH post fits the second. Claude also suggested "needs more data" generically; I rejected that as the sole explanation because the Groq baseline got 100% on the same test set with the same definitions, pointing to a fine-tuning/data-representation problem rather than an impossible task.
 
 4. **Project setup:** Cursor assisted with `planning.md` structure, README template, and notebook label-map configuration. All label decisions and dataset content were reviewed by me.
 
@@ -290,14 +292,15 @@ _Run 3–5 posts through the fine-tuned model in Colab (demo cell after Section 
 
 ## Demo Video
 
-**Link:** _TBD_
+**Link:** _Add your Loom/YouTube/Drive link here after recording_
 
-3–5 minute walkthrough covering:
+Full script with narration, timing, and Colab demo cell → [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md)
 
-- [ ] 3–5 live classifications with label + confidence visible
-- [ ] One correct prediction narrated (why the label fits)
-- [ ] One incorrect prediction narrated (what boundary failed and why)
-- [ ] Brief evaluation report walkthrough (accuracy, one F1, one confusion-matrix cell)
+**Covers:**
+- [x] 5 live classifications with label + confidence (see demo cell in script)
+- [x] Correct prediction narrated — NVDA analysis post (Post 1 in script)
+- [x] Incorrect prediction narrated — SMCI trade call or Fed soft-landing post (Post 4/5)
+- [x] Evaluation walkthrough — 0.75 vs 1.00 accuracy, Speculative F1 0.43, confusion matrix cell (7 → Reaction)
 
 ---
 
