@@ -289,21 +289,3 @@ Only **2 wrong predictions out of 32** — both on the **Speculative ↔ Market 
 4. **Project setup:** Cursor assisted with `planning.md` structure, README template, and notebook label-map configuration. All label decisions and dataset content were reviewed by me.
 
 ---
-
-## Demo Video
-
-**Link:** _Add your Loom/YouTube/Drive link here after recording_
-
-Full script with narration, timing, and Colab demo cell → [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md)
-
-**Covers:**
-- [x] 5 live classifications with label + confidence (see demo cell in script)
-- [x] Correct prediction narrated — NVDA analysis post (Post 1 in script)
-- [x] Incorrect prediction narrated — SMCI trade call or Fed soft-landing post (Post 4/5)
-- [x] Eval walkthrough — **0.94 vs 1.00**, all F1 ≥ 0.90, 2 symmetric errors on confusion matrix
-
----
-
-## Author
-
-AI201 Project 3 — TakeMeter
