@@ -181,7 +181,7 @@ I'll verify every pattern manually by re-reading the examples — AI suggestions
 
 ---
 
-## Spec Reflection (working notes — expanded in README after results)
+## Spec Reflection 
 
 **How the spec helped:** Writing label decision rules before annotating prevented me from drifting mid-dataset. The "remove the opinion framing" test for analysis vs. speculation came directly from the milestone guidance and saved me from inconsistent labels.
 
@@ -189,4 +189,4 @@ I'll verify every pattern manually by re-reading the examples — AI suggestions
 
 ---
 
-*Last updated: before Colab training run. Evaluation numbers and failure analysis will be added to README after Milestones 4–6.*
+

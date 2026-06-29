@@ -1,7 +1,7 @@
 {
   "baseline_accuracy": 1.0,
-  "finetuned_accuracy": 0.75,
-  "improvement": -0.25,
+  "finetuned_accuracy": 0.9375,
+  "improvement": -0.0625,
   "test_set_size": 32,
   "label_map": {
     "Evidence-Based Analysis": 0,
@@ -10,9 +10,9 @@
   },
   "model": "distilbert-base-uncased",
   "finetuned_per_class": {
-    "Evidence-Based Analysis": { "precision": 0.92, "recall": 1.0, "f1": 0.96, "support": 11 },
-    "Speculative Opinion": { "precision": 1.0, "recall": 0.27, "f1": 0.43, "support": 11 },
-    "Market Reaction": { "precision": 0.59, "recall": 1.0, "f1": 0.74, "support": 10 }
+    "Evidence-Based Analysis": { "precision": 1.0, "recall": 1.0, "f1": 1.0, "support": 11 },
+    "Speculative Opinion": { "precision": 0.91, "recall": 0.91, "f1": 0.91, "support": 11 },
+    "Market Reaction": { "precision": 0.9, "recall": 0.9, "f1": 0.9, "support": 10 }
   },
   "baseline_per_class": {
     "Evidence-Based Analysis": { "precision": 1.0, "recall": 1.0, "f1": 1.0, "support": 11 },
@@ -23,8 +23,22 @@
     "labels": ["Evidence-Based Analysis", "Speculative Opinion", "Market Reaction"],
     "matrix": [
       [11, 0, 0],
-      [1, 3, 7],
-      [0, 0, 10]
+      [0, 10, 1],
+      [0, 1, 9]
     ]
-  }
+  },
+  "wrong_predictions": [
+    {
+      "text": "There's no soft landing. The Fed has never pulled this off and won't now.",
+      "true": "Speculative Opinion",
+      "predicted": "Market Reaction",
+      "confidence": 0.38
+    },
+    {
+      "text": "Turned $5,000 into $47,000 during 2020-2021. Turned $47,000 into $9,000 by 2023. The full journey.",
+      "true": "Market Reaction",
+      "predicted": "Speculative Opinion",
+      "confidence": 0.33
+    }
+  ]
 }
